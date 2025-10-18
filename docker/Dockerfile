@@ -16,11 +16,15 @@ RUN poetry self add poetry-dynamic-versioning && \
     rm -rf /app/.git
 
 
-FROM python:3.12-slim as runner
+FROM python:3.12-slim AS runner
 
 WORKDIR /app
 
 COPY --from=builder /app/ /app/
 
+# Create config directory for external config mapping
+RUN mkdir -p /config
+
 ENTRYPOINT ["/app/.venv/bin/javsp"]
-CMD ["-i", "/video"]
+# Use config from /config directory if exists, otherwise use default
+CMD ["-c", "/config/config.yml", "-i", "/video"]
